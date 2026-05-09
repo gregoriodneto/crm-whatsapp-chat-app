@@ -3,22 +3,24 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+
+  "engines": {
+    "node": "20.x"
+  },
+
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/app.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+
   "type": "commonjs",
+
   "dependencies": {
     "@whiskeysockets/baileys": "^6.7.5",
-    "crypto": "^1.0.1",
     "date-fns": "^4.1.0",
     "express": "^5.2.1",
     "node-cron": "^4.2.1",
     "qrcode": "^1.5.4",
     "qrcode-terminal": "^0.12.0",
-    "sqlite3": "^6.0.1"
+    "sqlite3": "^5.1.7"
   }
 }
