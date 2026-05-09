@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- RESPONSIVO -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Sistema de Cobrança</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      color: #333;
+    }
+
+    header {
+      background: #1f2937;
+      color: white;
+      padding: 18px 20px;
+      font-size: 22px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    /* =========================
+       CARDS
+    ========================= */
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 22px;
+      border-radius: 14px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+      text-decoration: none;
+      color: #333;
+      transition: 0.2s;
+      min-height: 140px;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-title {
+      font-size: 20px;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    /* =========================
+       STATUS
+    ========================= */
+
+    .status {
+      margin-top: 30px;
+      padding: 22px;
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .status h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .status-item {
+      margin-bottom: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #f8fafc;
+      font-size: 15px;
+    }
+
+    .ok {
+      color: green;
+      font-weight: bold;
+    }
+
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #999;
+      font-size: 13px;
+      padding: 20px;
+    }
+
+    /* =========================
+       LOGIN
+    ========================= */
+
+    #login-screen {
+      position: fixed;
+      inset: 0;
+      background: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 9999;
+    }
+
+    .login-box {
+      background: white;
+      padding: 35px;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 3px 18px rgba(0, 0, 0, 0.1);
+    }
+
+    .login-box h2 {
+      margin-top: 0;
+      margin-bottom: 25px;
+      text-align: center;
+      color: #1f2937;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 14px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      font-size: 15px;
+    }
+
+    .login-box button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 18px;
+      background: #1f2937;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: bold;
+      transition: 0.2s;
+    }
+
+    .login-box button:hover {
+      opacity: 0.92;
+    }
+
+    .error {
+      color: red;
+      margin-top: 12px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    #app {
+      display: none;
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 768px) {
+
+      header {
+        font-size: 20px;
+        padding: 16px;
+      }
+
+      .container {
+        padding: 16px;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: auto;
+        padding: 20px;
+      }
+
+      .card-title {
+        font-size: 18px;
+      }
+
+      .card-desc {
+        font-size: 14px;
+      }
+
+      .status {
+        padding: 18px;
+      }
+
+      .status h3 {
+        font-size: 18px;
+      }
+
+      .status-item {
+        font-size: 14px;
+      }
+
+      .login-box {
+        padding: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN -->
+  <div id="login-screen">
+
+    <div class="login-box">
+
+      <h2>Entrar</h2>
+
+      <input
+        type="password"
+        id="password"
+        placeholder="Digite sua senha"
+      >
+
+      <button onclick="login()">
+        Entrar
+      </button>
+
+      <div class="error" id="error"></div>
+
+    </div>
+
+  </div>
+
+  <!-- SISTEMA -->
+  <div id="app">
+
+    <header>
+      Sistema de Cobrança
+    </header>
+
+    <div class="container">
+
+      <div class="cards">
+
+        <a class="card" href="/clients.html">
+          <div class="card-title">Clientes</div>
+          <div class="card-desc">
+            Gerenciar clientes cadastrados
+          </div>
+        </a>
+
+        <a class="card" href="/payments.html">
+          <div class="card-title">Pagamentos</div>
+          <div class="card-desc">
+            Controlar cobranças e vencimentos
+          </div>
+        </a>
+
+        <a class="card" href="/messages.html">
+          <div class="card-title">Mensagens</div>
+          <div class="card-desc">
+            Configurar mensagens automáticas
+          </div>
+        </a>
+
+        <a class="card" href="/qr.html">
+          <div class="card-title">WhatsApp</div>
+          <div class="card-desc">
+            Conectar ou reconectar sessão
+          </div>
+        </a>
+
+      </div>
+
+      <div class="status">
+
+        <h3>Status do Sistema</h3>
+
+        <div id="status"></div>
+
+      </div>
+
+    </div>
+
+    <footer>
+      Sistema de cobrança automática - versão inicial
+    </footer>
+
+  </div>
+
+  <script>
+
+    // =========================
+    // LOGIN
+    // =========================
+
+    async function login() {
+
+      const password = document.getElementById('password').value
+      const error = document.getElementById('error')
+
+      error.innerText = ''
+
+      try {
+
+        const res = await fetch('/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            password
+          })
+        })
+
+        const data = await res.json()
+
+        if (!res.ok) {
+          error.innerText = data.error
+          return
+        }
+
+        localStorage.setItem('token', data.token)
+
+        initSystem()
+
+      } catch (err) {
+        error.innerText = 'Erro ao conectar'
+      }
+    }
+
+    function initSystem() {
+
+      document.getElementById('login-screen').style.display = 'none'
+      document.getElementById('app').style.display = 'block'
+
+      loadStatus()
+    }
+
+    // =========================
+    // TOKEN
+    // =========================
+
+    const token = localStorage.getItem('token')
+
+    function authHeaders() {
+      return {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    }
+
+    // =========================
+    // FETCH
+    // =========================
+
+    async function safeFetch(url) {
+
+      try {
+
+        const res = await fetch(url, {
+          headers: authHeaders()
+        })
+
+        if (res.status === 401) {
+
+          localStorage.removeItem('token')
+
+          location.reload()
+
+          return []
+        }
+
+        if (!res.ok) {
+          return []
+        }
+
+        return await res.json()
+
+      } catch (err) {
+
+        console.error(err)
+
+        return []
+      }
+    }
+
+    // =========================
+    // STATUS
+    // =========================
+
+    async function loadStatus() {
+
+      const statusDiv = document.getElementById('status')
+
+      const clients = await safeFetch('/clients')
+      const payments = await safeFetch('/payments')
+      const messages = await safeFetch('/messages')
+
+      statusDiv.innerHTML = `
+        <div class="status-item ok">
+          Clientes cadastrados: ${clients.length}
+        </div>
+
+        <div class="status-item ok">
+          Pagamentos pendentes: ${payments.length}
+        </div>
+
+        <div class="status-item ok">
+          Mensagens configuradas: ${messages.length}
+        </div>
+      `
+    }
+
+    // =========================
+    // AUTO LOGIN
+    // =========================
+
+    if (token) {
+      initSystem()
+    }
+
+  </script>
+
+</body>
+
+</html>

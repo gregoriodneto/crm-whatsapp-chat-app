@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mensagens</title>
+
+  <style>
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 15px;
+      color: #333;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 28px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #1f2937;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    .btn-back {
+      width: auto;
+      padding: 10px 16px;
+      background: #6c757d;
+      color: white;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: #28a745;
+      color: white;
+      font-size: 16px;
+      border-radius: 8px;
+    }
+
+    .btn-primary:hover {
+      background: #218838;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 25px;
+    }
+
+    li {
+      background: #fafafa;
+      padding: 18px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      border-left: 5px solid #28a745;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .type {
+      font-weight: bold;
+      color: #222;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .content {
+      color: #555;
+      line-height: 1.6;
+      word-break: break-word;
+    }
+
+    .error {
+      color: red;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    .message-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .btn-sm {
+      width: auto;
+      padding: 10px 14px;
+      font-size: 13px;
+      border-radius: 8px;
+      color: white;
+    }
+
+    .btn-edit {
+      background: #f39c12;
+    }
+
+    .btn-edit:hover {
+      background: #d68910;
+    }
+
+    .btn-danger {
+      background: #e74c3c;
+    }
+
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+
+    @media (max-width: 768px) {
+
+      body{
+        padding:12px;
+      }
+
+      .container {
+        padding: 18px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .message-actions {
+        flex-direction: column;
+      }
+
+      .btn-sm {
+        width: 100%;
+      }
+
+      .btn-back {
+        width: 100%;
+      }
+
+      input,
+      textarea,
+      select {
+        font-size: 14px;
+      }
+
+      .btn-primary {
+        font-size: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+
+      h1 {
+        font-size: 22px;
+      }
+
+      li {
+        padding: 15px;
+      }
+
+      .type {
+        font-size: 15px;
+      }
+
+      .content {
+        font-size: 14px;
+      }
+
+      .btn-primary,
+      .btn-back,
+      .btn-sm {
+        padding: 12px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <button class="btn-back" onclick="goBack()">
+    ← Voltar
+  </button>
+
+  <div class="container">
+
+    <h1>Cadastro de Mensagens</h1>
+
+    <div id="error" class="error"></div>
+
+    <select id="type">
+      <option value="">Selecione o tipo</option>
+      <option value="before_2_days">2 dias antes</option>
+      <option value="before_1_day">1 dia antes</option>
+      <option value="due_today">No dia do vencimento</option>
+      <option value="after_1_day">1 dia após vencimento</option>
+    </select>
+
+    <textarea 
+      id="content"
+      placeholder="Ex: Olá {name}, sua mensalidade vence amanhã."
+    ></textarea>
+
+    <button class="btn-primary" onclick="createMessage()">
+      Salvar Mensagem
+    </button>
+
+    <ul id="messages"></ul>
+
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+
+</html>

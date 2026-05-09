@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pagamentos</title>
+
+  <style>
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 15px;
+      color: #333;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 25px;
+    }
+
+    /* TOPO */
+
+    .top-bar {
+      margin-bottom: 15px;
+    }
+
+    /* GRID */
+
+    .row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .col {
+      flex: 1;
+    }
+
+    /* INPUTS */
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #1f2937;
+    }
+
+    /* BOTÕES */
+
+    button {
+      padding: 12px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    .btn {
+      background: #28a745;
+    }
+
+    .btn-pay {
+      background: #3498db;
+    }
+
+    .btn-delete {
+      background: #e74c3c;
+    }
+
+    .btn-back {
+      background: #6c757d;
+    }
+
+    .btn-select {
+      background: #f39c12;
+    }
+
+    /* CLIENTES */
+
+    .clients-box {
+      max-height: 280px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+
+    .client-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      transition: 0.2s;
+    }
+
+    .client-checkbox:last-child {
+      border-bottom: none;
+    }
+
+    .client-checkbox:hover {
+      background: #f1f1f1;
+    }
+
+    .client-check {
+      flex: 0;
+      width: 16px;
+      height: 16px;
+    }
+
+    .client-name {
+      flex: 1;
+      font-weight: 500;
+      word-break: break-word;
+    }
+
+    .client-day {
+      font-size: 12px;
+      color: #666;
+      white-space: nowrap;
+    }
+
+    /* AÇÕES */
+
+    .actions {
+      margin-top: 15px;
+      margin-bottom: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .actions button {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    /* PAGAMENTOS */
+
+    .payment-item {
+      font-size: 14px;
+      padding: 15px;
+      margin-top: 10px;
+      border-radius: 10px;
+      border-left: 5px solid #007bff;
+      background: #fafafa;
+      line-height: 1.7;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    .paid {
+      border-left-color: green;
+      background: #f4fff6;
+    }
+
+    .payment-item strong {
+      font-size: 16px;
+    }
+
+    .payment-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .payment-actions button {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    /* ERRO */
+
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    hr {
+      margin: 20px 0;
+      border: none;
+      border-top: 1px solid #eee;
+    }
+
+    /* RESPONSIVO */
+
+    @media (max-width: 768px) {
+
+      body{
+        padding:12px;
+      }
+
+      .container {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .row {
+        flex-direction: column;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions button {
+        width: 100%;
+      }
+
+      .payment-actions {
+        flex-direction: column;
+      }
+
+      .payment-actions button {
+        width: 100%;
+      }
+
+      .client-checkbox {
+        align-items: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .client-day {
+        width: 100%;
+        margin-left: 26px;
+      }
+
+      .btn-back {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+
+      h1 {
+        font-size: 22px;
+      }
+
+      input {
+        font-size: 14px;
+        padding: 11px;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 11px;
+      }
+
+      .payment-item {
+        font-size: 13px;
+      }
+
+      .payment-item strong {
+        font-size: 15px;
+      }
+
+      .client-name {
+        font-size: 14px;
+      }
+
+      .client-day {
+        font-size: 11px;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="top-bar">
+      <button class="btn-back" onclick="goBack()">
+        ← Voltar
+      </button>
+    </div>
+
+    <h1>Pagamentos</h1>
+
+    <div id="error" class="error"></div>
+
+    <!-- BUSCA -->
+    <div class="row">
+      <div class="col">
+        <input 
+          id="search-client"
+          placeholder="Buscar cliente..."
+        />
+      </div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div class="clients-box" id="clients-list"></div>
+
+    <!-- AÇÕES -->
+    <div class="actions">
+
+      <button class="btn" onclick="createPayment()">
+        Criar Pagamentos
+      </button>
+
+      <button class="btn-pay" onclick="markSelectedAsPaid()">
+        Marcar como Pago
+      </button>
+
+      <button class="btn-select" onclick="selectAllClients()">
+        Selecionar Todos
+      </button>
+
+    </div>
+
+    <hr>
+
+    <!-- LISTA -->
+    <div id="payments"></div>
+
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+
+</html>

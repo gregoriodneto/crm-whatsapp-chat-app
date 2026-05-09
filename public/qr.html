@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>WhatsApp</title>
+
+  <style>
+    body{
+      margin:0;
+      padding:20px;
+      font-family:Arial;
+      background:#f4f6f8;
+    }
+
+    .container{
+      max-width:500px;
+      margin:auto;
+      background:white;
+      padding:20px;
+      border-radius:10px;
+      box-shadow:0 0 10px rgba(0,0,0,0.1);
+      text-align:center;
+    }
+
+    img{
+      width:100%;
+      max-width:300px;
+      margin-top:20px;
+    }
+
+    .ok{
+      color:green;
+      font-size:22px;
+      font-weight:bold;
+    }
+
+    button{
+      margin-top:20px;
+      padding:10px 20px;
+      border:none;
+      background:#1f2937;
+      color:white;
+      border-radius:5px;
+      cursor:pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>WhatsApp</h1>
+
+    <div id="content">
+      Carregando...
+    </div>
+
+    <button onclick="window.location.href='/'">
+      Voltar
+    </button>
+
+  </div>
+
+  <script>
+
+    async function loadQr() {
+
+      const token = localStorage.getItem('token')
+
+      if(!token){
+        window.location.href = '/'
+        return
+      }
+
+      const res = await fetch('/qr-code', {
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      })
+
+      if(res.status === 401){
+        localStorage.removeItem('token')
+        window.location.href = '/'
+        return
+      }
+
+      const data = await res.json()
+
+      const content = document.getElementById('content')
+
+      if(data.connected){
+        content.innerHTML = `
+          <div class="ok">
+            ✅ WhatsApp conectado
+          </div>
+        `
+      }else{
+        content.innerHTML = `
+          <p>Escaneie o QR Code:</p>
+
+          <img src="${data.qr}">
+        `
+      }
+    }
+
+    loadQr()
+
+    setInterval(loadQr, 3000)
+
+  </script>
+
+</body>
+
+</html>

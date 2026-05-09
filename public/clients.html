@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      margin: 0;
+      padding: 15px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 28px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .top-bar {
+      margin-bottom: 15px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #1f2937;
+    }
+
+    button {
+      padding: 12px 18px;
+      border: none;
+      background: #2ecc71;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: 0.2s;
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    .btn-back {
+      background: #6c757d;
+    }
+
+    .btn-delete {
+      background: #e74c3c;
+    }
+
+    .btn-edit {
+      background: #f39c12;
+    }
+
+    .error {
+      color: red;
+      margin-top: 12px;
+      font-size: 14px;
+    }
+
+    .client-item {
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .client-item:last-child {
+      border-bottom: none;
+    }
+
+    .client-item strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .client-info {
+      line-height: 1.7;
+      word-break: break-word;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .actions button {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    @media (max-width: 768px) {
+
+      body {
+        padding: 12px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .form-group {
+        grid-template-columns: 1fr;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+
+      .actions button {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+
+      h1 {
+        font-size: 22px;
+      }
+
+      input {
+        font-size: 14px;
+        padding: 11px;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 11px;
+      }
+
+      .client-item strong {
+        font-size: 16px;
+      }
+
+      .client-info {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="top-bar">
+      <button class="btn-back" onclick="goBack()">
+        ← Voltar
+      </button>
+    </div>
+
+    <h1>Clientes</h1>
+
+    <div class="card">
+
+      <div class="form-group">
+        <input id="name" placeholder="Nome">
+
+        <input id="phone" placeholder="Telefone">
+
+        <input id="cpf" placeholder="CPF">
+
+        <input id="birth_date" type="date">
+
+        <input id="payment_day" placeholder="Dia pagamento (1-31)">
+      </div>
+
+      <br>
+
+      <button onclick="createClient()">
+        Salvar Cliente
+      </button>
+
+      <div id="error" class="error"></div>
+
+    </div>
+
+    <div class="card">
+
+      <h3>Lista de clientes</h3>
+
+      <div id="clients"></div>
+
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+
+</body>
+
+</html>
