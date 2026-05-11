@@ -159,3 +159,27 @@ exports.generateMonthlyPayments = () => {
     })
   })
 }
+
+exports.getPendingPaymentByPhone = (phone) => {
+  return new Promise((resolve, reject) => {
+
+    db.get(
+      `
+      SELECT p.*, c.phone
+      FROM payments p
+      JOIN clients c ON c.id = p.client_id
+      WHERE c.phone = ?
+      AND p.paid = 0
+      ORDER BY p.due_date ASC
+      LIMIT 1
+      `,
+      [phone],
+      (err, row) => {
+
+        if (err) return reject(err)
+
+        resolve(row)
+      }
+    )
+  })
+}

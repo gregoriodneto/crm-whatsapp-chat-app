@@ -4,6 +4,8 @@ const qrcode = require('qrcode')
 const fs = require('fs')
 const path = require('path')
 
+const paymentService = require('./services/paymentService')
+
 let qrCodeImage = null
 let sockGlobal = null
 
@@ -30,6 +32,90 @@ async function connectToWhatsApp() {
   sockGlobal = sock
 
   sock.ev.on('creds.update', saveCreds)
+
+  sock.ev.on('messages.upsert', async ({ messages }) => {
+
+    const msg = messages[0]
+
+    if (!msg.message) return
+    if (msg.key.fromMe) return
+
+    const remoteJid = msg.key.senderPn
+
+    if (!remoteJid.includes('@s.whatsapp.net')) {
+      return
+    }
+
+    // pega telefone
+    let phone = remoteJid
+      .replace('@s.whatsapp.net', '')
+      .replace('55', '')
+
+    // adiciona 9 novamente para bater com banco
+    if (phone.length === 10) {
+      phone =
+        phone.slice(0, 2) +
+        '9' +
+        phone.slice(2)
+    }
+
+    phone = phone.replace(
+      /^(\d{2})(\d{5})(\d{4})$/,
+      '($1) $2-$3'
+    )
+
+    console.log(phone)
+
+    // pega texto
+    const text =
+      msg.message.conversation ||
+      msg.message.extendedTextMessage?.text ||
+      ''
+
+    const normalized = text
+      .trim()
+      .toLowerCase()
+
+    console.log('Mensagem recebida:', normalized)
+
+    // palavras aceitas
+    const paidWords = [
+      'pago',
+      'pago!',
+      'paguei',
+      'paguei!'
+    ]
+
+    if (!paidWords.includes(normalized)) {
+      return
+    }
+
+    try {
+
+      const payment =
+        await paymentService.getPendingPaymentByPhone(phone)
+
+      if (!payment) {
+
+        await sock.sendMessage(remoteJid, {
+          text: 'Nenhuma mensalidade pendente encontrada.'
+        })
+
+        return
+      }
+
+      await paymentService.markAsPaid(payment.id)
+
+      await sock.sendMessage(remoteJid, {
+        text: 'Pagamento confirmado com sucesso'
+      })
+
+      console.log('Pagamento marcado como pago:', payment.id)
+
+    } catch (err) {
+      console.error(err)
+    }
+  })
 
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update

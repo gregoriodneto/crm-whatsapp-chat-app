@@ -5,6 +5,20 @@ function goBack() {
   window.location.href = '/'
 }
 
+function formatDate(value) {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '$1/$2')
+    .replace(/(\d{2})(\d)/, '$1/$2')
+    .slice(0, 10)
+}
+
+function convertDateToISO(date) {
+  const [day, month, year] = date.split('/')
+
+  return `${year}-${month}-${day}`
+}
+
 // ========================
 // FORMATADORES
 // ========================
@@ -39,6 +53,12 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('phone')) {
     document.getElementById('phone').addEventListener('input', (e) => {
       e.target.value = formatPhone(e.target.value)
+    })
+  }
+
+  if (document.getElementById('birth_date')) {
+    document.getElementById('birth_date').addEventListener('input', (e) => {
+      e.target.value = formatDate(e.target.value)
     })
   }
 })
@@ -117,7 +137,9 @@ async function createClient() {
     name: document.getElementById('name').value.trim(),
     phone: document.getElementById('phone').value.trim(),
     cpf: document.getElementById('cpf').value.trim(),
-    birth_date: document.getElementById('birth_date').value,
+    birth_date: convertDateToISO(
+      document.getElementById('birth_date').value
+    ),
     payment_day: document.getElementById('payment_day').value
   }
 
