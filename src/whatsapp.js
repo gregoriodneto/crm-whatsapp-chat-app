@@ -90,6 +90,12 @@ async function sendMessage(phone, text) {
     clean = '55' + clean
   }
 
+  if (clean.length === 13) {
+    clean =
+      clean.slice(0, 4) +
+      clean.slice(5)
+  }
+
   const jid = clean + '@s.whatsapp.net'
 
   await sockGlobal.sendMessage(jid, { text })
