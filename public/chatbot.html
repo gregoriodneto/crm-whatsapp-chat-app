@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    Configuração do Chatbot
+  </title>
+
+  <style>
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      padding:20px;
+      background:#f4f6f8;
+      font-family:Arial,sans-serif;
+      color:#333;
+    }
+
+    .container{
+      max-width:1100px;
+      margin:auto;
+    }
+
+    h1{
+      text-align:center;
+      margin-bottom:25px;
+      color:#111827;
+    }
+
+    .card{
+      background:white;
+      border-radius:14px;
+      padding:24px;
+      margin-bottom:20px;
+      box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    h2{
+      margin-top:0;
+      color:#1f2937;
+      margin-bottom:10px;
+    }
+
+    .subtitle-box{
+      background:#f9fafb;
+      border:1px solid #e5e7eb;
+      border-radius:10px;
+      padding:14px;
+      margin-bottom:18px;
+      line-height:1.7;
+      font-size:14px;
+      color:#555;
+    }
+
+    .example{
+      background:white;
+      border-left:4px solid #2563eb;
+      padding:12px;
+      margin-top:12px;
+      border-radius:8px;
+      white-space:pre-line;
+      color:#333;
+      line-height:1.6;
+    }
+
+    input,
+    textarea{
+      width:100%;
+      padding:12px;
+      border:1px solid #d1d5db;
+      border-radius:8px;
+      margin-bottom:12px;
+      font-size:14px;
+      outline:none;
+      transition:0.2s;
+    }
+
+    input:focus,
+    textarea:focus{
+      border-color:#2563eb;
+    }
+
+    textarea{
+      resize:vertical;
+      min-height:130px;
+      line-height:1.5;
+    }
+
+    button{
+      border:none;
+      padding:11px 18px;
+      border-radius:8px;
+      cursor:pointer;
+      color:white;
+      font-size:14px;
+      transition:0.2s;
+    }
+
+    button:hover{
+      opacity:0.92;
+    }
+
+    .btn-primary{
+      background:#1f2937;
+    }
+
+    .btn-add{
+      background:#2563eb;
+    }
+
+    .btn-delete{
+      background:#dc2626;
+    }
+
+    .btn-close{
+      background:#6b7280;
+    }
+
+    .tree{
+      margin-top:20px;
+    }
+
+    .node{
+      margin-left:25px;
+      border-left:2px solid #d1d5db;
+      padding-left:15px;
+      margin-top:15px;
+    }
+
+    .node-box{
+      background:#f9fafb;
+      border:1px solid #eee;
+      border-radius:12px;
+      padding:16px;
+    }
+
+    .node-title{
+      font-size:16px;
+      font-weight:bold;
+      margin-bottom:8px;
+      color:#111827;
+    }
+
+    .node-info{
+      color:#666;
+      font-size:13px;
+      margin-bottom:10px;
+    }
+
+    .node-message{
+      background:white;
+      border:1px solid #eee;
+      border-radius:8px;
+      padding:12px;
+      white-space:pre-line;
+      line-height:1.6;
+      margin-top:10px;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
+
+    .empty{
+      text-align:center;
+      color:#999;
+      padding:30px;
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      z-index:999;
+    }
+
+    .modal-content{
+      background:white;
+      width:100%;
+      max-width:650px;
+      border-radius:14px;
+      padding:22px;
+    }
+
+    .modal-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:15px;
+    }
+
+    @media(max-width:768px){
+
+      body{
+        padding:14px;
+      }
+
+      .card{
+        padding:18px;
+      }
+
+      .node{
+        margin-left:12px;
+      }
+
+      .actions{
+        flex-direction:column;
+      }
+
+      button{
+        width:100%;
+      }
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>
+      Configuração do Chatbot
+    </h1>
+
+    <!-- FLOW -->
+
+    <div class="card">
+
+      <h2>
+        Novo Atendimento
+      </h2>
+
+      <div class="subtitle-box">
+
+        Configure o fluxo principal do chatbot.
+
+        <br><br>
+
+        O cliente iniciará a conversa enviando palavras como:
+        <strong>oi</strong>,
+        <strong>menu</strong>,
+        <strong>ajuda</strong>
+        ou
+        <strong>atendimento</strong>.
+
+        <div class="example">
+
+Exemplo:
+
+Cliente envia:
+"oi"
+
+Chatbot responde:
+
+"Olá 👋
+
+Bem-vindo ao atendimento da academia.
+
+Escolha uma opção:
+
+1 - Financeiro
+2 - Horários
+3 - Treinos"
+
+        </div>
+
+      </div>
+
+      <input
+        id="flow-name"
+        placeholder="Nome do fluxo principal (Ex: Atendimento Academia)"
+      >
+
+      <input
+        id="flow-trigger"
+        placeholder="Palavras para iniciar o atendimento (Ex: oi, menu, ajuda)"
+      >
+
+      <input
+        id="flow-timeout"
+        placeholder="Tempo para encerrar conversa automaticamente (Ex: 5 minutos)"
+      >
+
+      <textarea
+        id="flow-message"
+        placeholder="Mensagem inicial enviada automaticamente ao cliente.
+
+Exemplo:
+
+Olá 👋
+
+Bem-vindo ao atendimento da academia.
+
+Escolha uma opção:
+
+1 - Financeiro
+2 - Horários
+3 - Falar com suporte"
+      ></textarea>
+
+      <button
+        class="btn-primary"
+        onclick="createFlow()"
+      >
+        Criar Atendimento
+      </button>
+
+    </div>
+
+    <!-- TREE -->
+
+    <div class="card">
+
+      <h2>
+        Estrutura do Chatbot
+      </h2>
+
+      <div class="subtitle-box">
+
+        Aqui você organiza os menus e submenus do chatbot.
+
+        <br><br>
+
+        Basta clicar em:
+        <strong>+ Adicionar submenu</strong>
+
+        para criar novas opções abaixo do menu atual.
+
+      </div>
+
+      <div id="tree"></div>
+
+    </div>
+
+  </div>
+
+  <!-- MODAL -->
+
+  <div
+    class="modal"
+    id="node-modal"
+  >
+
+    <div class="modal-content">
+
+      <div class="modal-header">
+
+        <h2>
+          Novo Submenu
+        </h2>
+
+        <button
+          class="btn-close"
+          onclick="closeModal()"
+        >
+          Fechar
+        </button>
+
+      </div>
+
+      <div class="subtitle-box">
+
+        Você está criando uma nova opção dentro do menu selecionado.
+
+        <div class="example">
+
+Exemplo:
+
+1 - Financeiro
+   ├── 1 - Segunda via
+   └── 2 - Confirmar pagamento
+
+        </div>
+
+      </div>
+
+      <input
+        id="option-key"
+        placeholder="Número ou palavra da opção (Ex: 1)"
+      >
+
+      <input
+        id="node-title"
+        placeholder="Título do submenu (Ex: Financeiro)"
+      >
+
+      <textarea
+        id="node-message"
+        placeholder="Mensagem opcional enviada quando o cliente entrar neste submenu.
+
+Exemplo:
+
+Escolha uma opção:
+
+1 - Segunda via
+2 - Confirmar pagamento"
+      ></textarea>
+
+      <button
+        class="btn-primary"
+        onclick="saveNode()"
+      >
+        Salvar Submenu
+      </button>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    const token =
+      localStorage.getItem('token')
+
+    if(!token){
+      window.location.href = '/'
+    }
+
+    let currentParentId = null
+    let currentFlowId = null
+
+    function authHeaders(){
+
+      return {
+        'Content-Type':'application/json',
+        'Authorization':`Bearer ${token}`
+      }
+    }
+
+    // =========================
+    // FLOW
+    // =========================
+
+    async function createFlow(){
+
+      const body = {
+
+        name:
+          document.getElementById(
+            'flow-name'
+          ).value.trim(),
+
+        trigger_words:
+          document.getElementById(
+            'flow-trigger'
+          ).value.trim(),
+
+        timeout_minutes:
+          document.getElementById(
+            'flow-timeout'
+          ).value.trim(),
+
+        message:
+          document.getElementById(
+            'flow-message'
+          ).value.trim()
+      }
+
+      await fetch('/chatbot/flow', {
+
+        method:'POST',
+
+        headers:authHeaders(),
+
+        body:JSON.stringify(body)
+      })
+
+      alert('Fluxo criado com sucesso')
+
+      document.getElementById(
+        'flow-name'
+      ).value = ''
+
+      document.getElementById(
+        'flow-trigger'
+      ).value = ''
+
+      document.getElementById(
+        'flow-timeout'
+      ).value = ''
+
+      document.getElementById(
+        'flow-message'
+      ).value = ''
+
+      loadTree()
+    }
+
+    // =========================
+    // TREE
+    // =========================
+
+    async function loadTree(){
+
+      const res =
+        await fetch('/chatbot/nodes', {
+          headers:authHeaders()
+        })
+
+      const nodes =
+        await res.json()
+
+      const tree =
+        document.getElementById('tree')
+
+      tree.innerHTML = ''
+
+      if(!nodes.length){
+
+        tree.innerHTML = `
+          <div class="empty">
+            Nenhum menu cadastrado
+          </div>
+        `
+
+        return
+      }
+
+      const roots =
+        nodes.filter(n => !n.parent_id)
+
+      roots.forEach(root => {
+
+        tree.innerHTML +=
+          renderNode(root, nodes)
+      })
+    }
+
+    function renderNode(node, allNodes){
+
+      const children =
+        allNodes.filter(
+          n => n.parent_id == node.id
+        )
+
+      return `
+
+        <div class="node">
+
+          <div class="node-box">
+
+            <div class="node-title">
+
+              ${node.option_key || 'ROOT'}
+              - ${node.title}
+
+            </div>
+
+            <div class="node-info">
+
+              Fluxo:
+              ${node.flow_id}
+
+            </div>
+
+            ${
+              node.message
+              ? `
+                <div class="node-message">
+                  ${node.message}
+                </div>
+              `
+              : ''
+            }
+
+            <div class="actions">
+
+              <button
+                class="btn-add"
+                onclick="openModal(
+                  ${node.flow_id},
+                  ${node.id}
+                )"
+              >
+                + Adicionar submenu
+              </button>
+
+              <button
+                class="btn-delete"
+                onclick="deleteNode(
+                  ${node.id}
+                )"
+              >
+                Excluir
+              </button>
+
+            </div>
+
+          </div>
+
+          ${
+            children.map(child =>
+              renderNode(child, allNodes)
+            ).join('')
+          }
+
+        </div>
+      `
+    }
+
+    // =========================
+    // MODAL
+    // =========================
+
+    function openModal(flowId, parentId){
+
+      currentFlowId = flowId
+      currentParentId = parentId
+
+      document.getElementById(
+        'node-modal'
+      ).style.display = 'flex'
+    }
+
+    function closeModal(){
+
+      document.getElementById(
+        'node-modal'
+      ).style.display = 'none'
+    }
+
+    // =========================
+    // SAVE NODE
+    // =========================
+
+    async function saveNode(){
+
+      const body = {
+
+        flow_id:
+          currentFlowId,
+
+        parent_id:
+          currentParentId,
+
+        option_key:
+          document.getElementById(
+            'option-key'
+          ).value.trim(),
+
+        title:
+          document.getElementById(
+            'node-title'
+          ).value.trim(),
+
+        message:
+          document.getElementById(
+            'node-message'
+          ).value.trim()
+      }
+
+      await fetch('/chatbot/node', {
+
+        method:'POST',
+
+        headers:authHeaders(),
+
+        body:JSON.stringify(body)
+      })
+
+      closeModal()
+
+      document.getElementById(
+        'option-key'
+      ).value = ''
+
+      document.getElementById(
+        'node-title'
+      ).value = ''
+
+      document.getElementById(
+        'node-message'
+      ).value = ''
+
+      loadTree()
+    }
+
+    // =========================
+    // DELETE NODE
+    // =========================
+
+    async function deleteNode(id){
+
+      const confirmDelete =
+        confirm(
+          'Deseja realmente excluir este menu e seus submenus?'
+        )
+
+      if(!confirmDelete){
+        return
+      }
+
+      await fetch(`/chatbot/node/${id}`, {
+
+        method:'DELETE',
+
+        headers:authHeaders()
+      })
+
+      loadTree()
+    }
+
+    // =========================
+    // INIT
+    // =========================
+
+    loadTree()
+
+  </script>
+
+</body>
+
+</html>

@@ -5,6 +5,7 @@ const fs = require('fs')
 const path = require('path')
 
 const paymentService = require('./services/paymentService')
+const chatbotService = require('./services/chatbotService')
 
 let qrCodeImage = null
 let sockGlobal = null
@@ -92,6 +93,13 @@ async function connectToWhatsApp() {
 
     try {
 
+      await chatbotService.handleIncomingMessage(
+        phone,
+        normalized,
+        sock,
+        remoteJid
+      )
+
       const payment =
         await paymentService.getPendingPaymentByPhone(phone)
 
@@ -132,6 +140,8 @@ async function connectToWhatsApp() {
     if (connection === 'open') {
       console.log('Conectado')
       qrCodeImage = null
+
+      chatbotService.startChatbotTimeoutScheduler(sock)
     }
 
     if (connection === 'close') {
@@ -167,6 +177,14 @@ function getQrCodeImage() {
 
 async function sendMessage(phone, text) {
   if (!sockGlobal) throw new Error('WhatsApp não conectado')
+
+  const connection =
+    sockGlobal?.ws?.socket?._readyState
+
+  // 1 = OPEN
+  /*if (connection !== 1) {
+    throw new Error('WhatsApp desconectado')
+  }*/
 
   // remove tudo que não é número
   let clean = phone.replace(/\D/g, '')
