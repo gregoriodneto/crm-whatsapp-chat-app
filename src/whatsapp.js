@@ -41,7 +41,14 @@ async function connectToWhatsApp() {
     if (!msg.message) return
     if (msg.key.fromMe) return
 
-    const remoteJid = msg.key.senderPn
+    const remoteJid =
+      msg.key.remoteJid ||
+      msg.key.participant ||
+      msg.key.senderPn
+
+    if (!remoteJid) {
+      return
+    }
 
     if (!remoteJid.includes('@s.whatsapp.net')) {
       return
@@ -49,6 +56,7 @@ async function connectToWhatsApp() {
 
     // pega telefone
     let phone = remoteJid
+      .split(':')[0]
       .replace('@s.whatsapp.net', '')
       .replace('55', '')
 
@@ -202,7 +210,22 @@ async function sendMessage(phone, text) {
 
   const jid = clean + '@s.whatsapp.net'
 
-  await sockGlobal.sendMessage(jid, { text })
+  console.log('Tentando enviar para:', jid)
+
+  const exists =
+    await sockGlobal.onWhatsApp(jid)
+
+  console.log('Resultado onWhatsApp:', exists)
+
+  const validJid = exists?.[0]?.jid
+
+  if (!validJid) {
+    throw new Error('Número inválido no WhatsApp')
+  }
+
+  await sockGlobal.sendMessage(validJid, {
+    text
+  })
 }
 
 module.exports = {
