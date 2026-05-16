@@ -1,23 +1,39 @@
-const { sessions } = require('../routes/auth')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
+
+const { SECRET } =
+  require('../routes/auth')
 
 function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization
 
-  if (!authHeader) {
-    return res.status(401).json({
-      error: 'Token não informado'
-    })
-  }
+  try {
 
-  const token = authHeader.replace('Bearer ', '')
+    const authHeader =
+      req.headers.authorization
 
-  if (!sessions.includes(token)) {
+    if (!authHeader) {
+
+      return res.status(401).json({
+        error: 'Token não informado'
+      })
+    }
+
+    const token =
+      authHeader.replace('Bearer ', '')
+
+    const decoded =
+      jwt.verify(token, SECRET)
+
+    req.user = decoded
+
+    next()
+
+  } catch {
+
     return res.status(401).json({
       error: 'Token inválido'
     })
   }
-
-  next()
 }
 
 module.exports = authMiddleware

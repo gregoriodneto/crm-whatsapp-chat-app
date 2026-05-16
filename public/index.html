@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8" />
 
-  <!-- RESPONSIVO -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Sistema de Cobrança</title>
@@ -35,10 +34,6 @@
       max-width: 1200px;
       margin: auto;
     }
-
-    /* =========================
-       CARDS
-    ========================= */
 
     .cards {
       display: grid;
@@ -78,10 +73,6 @@
       line-height: 1.5;
     }
 
-    /* =========================
-       STATUS
-    ========================= */
-
     .status {
       margin-top: 30px;
       padding: 22px;
@@ -117,11 +108,8 @@
       padding: 20px;
     }
 
-    /* =========================
-       LOGIN
-    ========================= */
-
-    #login-screen {
+    #login-screen,
+    #first-login-screen {
       position: fixed;
       inset: 0;
       background: #f4f6f8;
@@ -130,6 +118,10 @@
       align-items: center;
       padding: 20px;
       z-index: 9999;
+    }
+
+    #first-login-screen {
+      display: none;
     }
 
     .login-box {
@@ -168,11 +160,6 @@
       cursor: pointer;
       font-size: 15px;
       font-weight: bold;
-      transition: 0.2s;
-    }
-
-    .login-box button:hover {
-      opacity: 0.92;
     }
 
     .error {
@@ -186,20 +173,7 @@
       display: none;
     }
 
-    /* =========================
-       MOBILE
-    ========================= */
-
     @media (max-width: 768px) {
-
-      header {
-        font-size: 20px;
-        padding: 16px;
-      }
-
-      .container {
-        padding: 16px;
-      }
 
       .cards {
         grid-template-columns: 1fr;
@@ -207,31 +181,6 @@
 
       .card {
         min-height: auto;
-        padding: 20px;
-      }
-
-      .card-title {
-        font-size: 18px;
-      }
-
-      .card-desc {
-        font-size: 14px;
-      }
-
-      .status {
-        padding: 18px;
-      }
-
-      .status h3 {
-        font-size: 18px;
-      }
-
-      .status-item {
-        font-size: 14px;
-      }
-
-      .login-box {
-        padding: 28px;
       }
     }
   </style>
@@ -246,13 +195,52 @@
 
       <h2>Entrar</h2>
 
-      <input type="password" id="password" placeholder="Digite sua senha">
+      <input
+        type="text"
+        id="username"
+        placeholder="Usuário"
+      >
+
+      <input
+        type="password"
+        id="password"
+        placeholder="Senha"
+      >
 
       <button onclick="login()">
         Entrar
       </button>
 
-      <div class="error" id="error"></div>
+      <div class="error" id="login-error"></div>
+
+    </div>
+
+  </div>
+
+  <!-- PRIMEIRO LOGIN -->
+  <div id="first-login-screen">
+
+    <div class="login-box">
+
+      <h2>Alterar Senha</h2>
+
+      <input
+        type="password"
+        id="new-password"
+        placeholder="Nova senha"
+      >
+
+      <input
+        type="password"
+        id="confirm-password"
+        placeholder="Confirmar senha"
+      >
+
+      <button onclick="changeFirstPassword()">
+        Salvar Nova Senha
+      </button>
+
+      <div class="error" id="first-login-error"></div>
 
     </div>
 
@@ -271,6 +259,7 @@
 
         <a class="card" href="/clients.html">
           <div class="card-title">Clientes</div>
+
           <div class="card-desc">
             Gerenciar clientes cadastrados
           </div>
@@ -278,6 +267,7 @@
 
         <a class="card" href="/payments.html">
           <div class="card-title">Pagamentos</div>
+
           <div class="card-desc">
             Controlar cobranças e vencimentos
           </div>
@@ -285,6 +275,7 @@
 
         <a class="card" href="/messages.html">
           <div class="card-title">Mensagens</div>
+
           <div class="card-desc">
             Configurar mensagens automáticas
           </div>
@@ -300,6 +291,7 @@
 
         <a class="card" href="/qr.html">
           <div class="card-title">WhatsApp</div>
+
           <div class="card-desc">
             Conectar ou reconectar sessão
           </div>
@@ -318,12 +310,14 @@
     </div>
 
     <footer>
-      Sistema de cobrança automática - versão inicial
+      Sistema de cobrança automática
     </footer>
 
   </div>
 
   <script>
+
+    let firstLoginToken = null
 
     // =========================
     // LOGIN
@@ -331,8 +325,14 @@
 
     async function login() {
 
-      const password = document.getElementById('password').value
-      const error = document.getElementById('error')
+      const username =
+        document.getElementById('username').value
+
+      const password =
+        document.getElementById('password').value
+
+      const error =
+        document.getElementById('login-error')
 
       error.innerText = ''
 
@@ -344,6 +344,7 @@
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
+            username,
             password
           })
         })
@@ -351,36 +352,145 @@
         const data = await res.json()
 
         if (!res.ok) {
-          error.innerText = data.error
+          error.innerText =
+            data.error || 'Erro no login'
+
           return
         }
 
-        localStorage.setItem('token', data.token)
+        // PRIMEIRO LOGIN
+        if (data.firstLogin) {
+
+          firstLoginToken = data.tempToken
+
+          document.getElementById(
+            'login-screen'
+          ).style.display = 'none'
+
+          document.getElementById(
+            'first-login-screen'
+          ).style.display = 'flex'
+
+          return
+        }
+
+        localStorage.setItem(
+          'token',
+          data.token
+        )
 
         initSystem()
 
       } catch (err) {
-        error.innerText = 'Erro ao conectar'
+
+        error.innerText =
+          'Erro ao conectar'
       }
     }
 
+    // =========================
+    // PRIMEIRA SENHA
+    // =========================
+
+    async function changeFirstPassword() {
+
+      const password =
+        document.getElementById('new-password').value
+
+      const confirm =
+        document.getElementById('confirm-password').value
+
+      const error =
+        document.getElementById('first-login-error')
+
+      error.innerText = ''
+
+      if (password !== confirm) {
+
+        error.innerText =
+          'As senhas não coincidem'
+
+        return
+      }
+
+      if (password.length < 6) {
+
+        error.innerText =
+          'Senha deve ter pelo menos 6 caracteres'
+
+        return
+      }
+
+      try {
+
+        const res = await fetch(
+          '/auth/first-password',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              tempToken: firstLoginToken,
+              password
+            })
+          }
+        )
+
+        const data = await res.json()
+
+        if (!res.ok) {
+
+          error.innerText =
+            data.error || 'Erro'
+
+          return
+        }
+
+        localStorage.setItem(
+          'token',
+          data.token
+        )
+
+        initSystem()
+
+      } catch (err) {
+
+        error.innerText =
+          'Erro ao alterar senha'
+      }
+    }
+
+    // =========================
+    // INIT
+    // =========================
+
     function initSystem() {
 
-      document.getElementById('login-screen').style.display = 'none'
-      document.getElementById('app').style.display = 'block'
+      document.getElementById(
+        'login-screen'
+      ).style.display = 'none'
+
+      document.getElementById(
+        'first-login-screen'
+      ).style.display = 'none'
+
+      document.getElementById(
+        'app'
+      ).style.display = 'block'
 
       loadStatus()
     }
 
     // =========================
-    // TOKEN
+    // AUTH
     // =========================
 
-    const token = localStorage.getItem('token')
-
     function authHeaders() {
+
       return {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
+        'Authorization':
+          `Bearer ${localStorage.getItem('token')}`
       }
     }
 
@@ -405,10 +515,6 @@
           return []
         }
 
-        if (!res.ok) {
-          return []
-        }
-
         return await res.json()
 
       } catch (err) {
@@ -425,11 +531,17 @@
 
     async function loadStatus() {
 
-      const statusDiv = document.getElementById('status')
+      const statusDiv =
+        document.getElementById('status')
 
-      const clients = await safeFetch('/clients')
-      const payments = await safeFetch('/payments')
-      const messages = await safeFetch('/messages')
+      const clients =
+        await safeFetch('/clients')
+
+      const payments =
+        await safeFetch('/payments')
+
+      const messages =
+        await safeFetch('/messages')
 
       statusDiv.innerHTML = `
         <div class="status-item ok">
@@ -449,6 +561,9 @@
     // =========================
     // AUTO LOGIN
     // =========================
+
+    const token =
+      localStorage.getItem('token')
 
     if (token) {
       initSystem()

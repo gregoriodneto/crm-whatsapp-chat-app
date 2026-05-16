@@ -1,9 +1,65 @@
 const sqlite3 = require('sqlite3').verbose()
+const bcrypt = require('bcrypt')
 
 const db =
   new sqlite3.Database('./database.sqlite')
 
 db.serialize(() => {
+  // =========================
+  // USERS
+  // =========================
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      first_login INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `)
+
+  // =========================
+  // DEFAULT USER
+  // =========================
+
+  db.get(
+    `
+  SELECT id
+  FROM users
+  WHERE username = ?
+  `,
+    ['academia_energiafitnessrn'],
+    async (err, row) => {
+
+      if (row) return
+
+      const hash =
+        await bcrypt.hash(
+          'Energia@2026',
+          10
+        )
+
+      db.run(
+        `
+      INSERT INTO users (
+        username,
+        password,
+        first_login
+      )
+      VALUES (?, ?, 1)
+      `,
+        [
+          'academia_energiafitnessrn',
+          hash
+        ]
+      )
+
+      console.log(
+        'Usuário padrão criado'
+      )
+    }
+  )
 
   // =========================
   // CLIENTS
@@ -156,9 +212,9 @@ db.serialize(() => {
   const defaultMessages = [
 
     {
-      type:'before_2_days',
+      type: 'before_2_days',
       content:
-`Olá {name} 👋
+        `Olá {name} 👋
 
 Sua mensalidade vence em 2 dias.
 
@@ -166,9 +222,9 @@ Caso já tenha realizado o pagamento, ignore esta mensagem.`
     },
 
     {
-      type:'before_1_day',
+      type: 'before_1_day',
       content:
-`Olá {name} 👋
+        `Olá {name} 👋
 
 Sua mensalidade vence amanhã.
 
@@ -176,9 +232,9 @@ Evite atrasos realizando o pagamento antecipadamente.`
     },
 
     {
-      type:'due_today',
+      type: 'due_today',
       content:
-`Olá {name} 👋
+        `Olá {name} 👋
 
 Sua mensalidade vence hoje.
 
@@ -187,9 +243,9 @@ Após o pagamento envie:
     },
 
     {
-      type:'after_1_day',
+      type: 'after_1_day',
       content:
-`Olá {name} 👋
+        `Olá {name} 👋
 
 Identificamos uma mensalidade em atraso.
 
@@ -220,23 +276,23 @@ Caso já tenha realizado o pagamento envie:
     WHERE phone = '(84) 99999-9999'
   `,
 
-  [],
+    [],
 
-  (err, row) => {
+    (err, row) => {
 
-    if(row) return
+      if (row) return
 
-    const yesterday = new Date()
+      const yesterday = new Date()
 
-    yesterday.setDate(
-      yesterday.getDate() - 1
-    )
+      yesterday.setDate(
+        yesterday.getDate() - 1
+      )
 
-    const dueDate =
-      yesterday.toISOString()
-      .split('T')[0]
+      const dueDate =
+        yesterday.toISOString()
+          .split('T')[0]
 
-    db.run(`
+      db.run(`
       INSERT INTO clients (
 
         name,
@@ -250,20 +306,20 @@ Caso já tenha realizado o pagamento envie:
       VALUES (?, ?, ?, ?, ?, datetime('now'))
     `,
 
-    [
-      'Leo Teste',
-      '000.000.000-00',
-      '(84) 99613-5117',
-      '2000-01-01',
-      yesterday.getDate()
-    ],
+        [
+          'Leo Teste',
+          '000.000.000-00',
+          '(84) 99613-5117',
+          '2000-01-01',
+          yesterday.getDate()
+        ],
 
-    function() {
+        function () {
 
-      const clientId =
-        this.lastID
+          const clientId =
+            this.lastID
 
-      db.run(`
+          db.run(`
         INSERT OR IGNORE INTO payments (
 
           client_id,
@@ -274,16 +330,16 @@ Caso já tenha realizado o pagamento envie:
         VALUES (?, ?, 0)
       `,
 
-      [
-        clientId,
-        dueDate
-      ])
+            [
+              clientId,
+              dueDate
+            ])
 
-      console.log(
-        'Cliente padrão criado'
-      )
+          console.log(
+            'Cliente padrão criado'
+          )
+        })
     })
-  })
 })
 
 module.exports = db
