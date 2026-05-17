@@ -1,14 +1,19 @@
-const db = require('../db')
+const supabase =
+  require('../config/supabase')
 
-exports.getMessageByType = (type) => {
-  return new Promise((resolve, reject) => {
-    db.get(
-      `SELECT * FROM messages WHERE type = ?`,
-      [type],
-      (err, row) => {
-        if (err) return reject(err)
-        resolve(row)
-      }
-    )
-  })
-}
+exports.getMessageByType =
+  async (type) => {
+
+    const { data, error } =
+      await supabase
+        .from('messages')
+        .select('*')
+        .eq('type', type)
+        .single()
+
+    if (error) {
+      return null
+    }
+
+    return data
+  }

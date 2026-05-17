@@ -1,56 +1,99 @@
-const db = require('../db')
+const supabase =
+  require('../config/supabase')
 
-exports.createClient = (client) => {
-  return new Promise((resolve, reject) => {
-    const { name, cpf, phone, birth_date, payment_day } = client
+exports.createClient =
+  async (client) => {
 
-    db.run(
-      `INSERT INTO clients (name, cpf, phone, birth_date, payment_day, created_at)
-       VALUES (?, ?, ?, ?, ?, datetime('now'))`,
-      [name, cpf, phone, birth_date, payment_day],
-      function (err) {
-        if (err) return reject(err)
-        resolve({ id: this.lastID })
-      }
-    )
-  })
-}
+    const {
+      name,
+      cpf,
+      phone,
+      birth_date,
+      payment_day
+    } = client
 
-exports.getClients = () => {
-  return new Promise((resolve, reject) => {
-    db.all(`SELECT * FROM clients`, [], (err, rows) => {
-      if (err) return reject(err)
-      resolve(rows)
-    })
-  })
-}
+    const { data, error } =
+      await supabase
+        .from('clients')
+        .insert([
+          {
+            name,
+            cpf,
+            phone,
+            birth_date,
+            payment_day
+          }
+        ])
+        .select()
+        .single()
 
-exports.updateClient = (id, client) => {
-  return new Promise((resolve, reject) => {
-    const { name, cpf, phone, birth_date, payment_day } = client
+    if (error) {
+      throw error
+    }
 
-    db.run(
-      `UPDATE clients 
-       SET name = ?, cpf = ?, phone = ?, birth_date = ?, payment_day = ?
-       WHERE id = ?`,
-      [name, cpf, phone, birth_date, payment_day, id],
-      function (err) {
-        if (err) return reject(err)
-        resolve(true)
-      }
-    )
-  })
-}
+    return data
+  }
 
-exports.deleteClient = (id) => {
-  return new Promise((resolve, reject) => {
-    db.run(
-      `DELETE FROM clients WHERE id = ?`,
-      [id],
-      function (err) {
-        if (err) return reject(err)
-        resolve(true)
-      }
-    )
-  })
-}
+exports.getClients =
+  async () => {
+
+    const { data, error } =
+      await supabase
+        .from('clients')
+        .select('*')
+        .order('id', {
+          ascending: false
+        })
+
+    if (error) {
+      throw error
+    }
+
+    return data || []
+  }
+
+exports.updateClient =
+  async (id, client) => {
+
+    const {
+      name,
+      cpf,
+      phone,
+      birth_date,
+      payment_day
+    } = client
+
+    const { error } =
+      await supabase
+        .from('clients')
+        .update({
+          name,
+          cpf,
+          phone,
+          birth_date,
+          payment_day
+        })
+        .eq('id', id)
+
+    if (error) {
+      throw error
+    }
+
+    return true
+  }
+
+exports.deleteClient =
+  async (id) => {
+
+    const { error } =
+      await supabase
+        .from('clients')
+        .delete()
+        .eq('id', id)
+
+    if (error) {
+      throw error
+    }
+
+    return true
+  }

@@ -1,4 +1,5 @@
-const db = require('../db')
+const supabase =
+  require('../config/supabase')
 
 const sessions = new Map()
 
@@ -24,112 +25,118 @@ function isTrigger(text) {
   return triggers.includes(normalize(text))
 }
 
-function getFlow() {
-  return new Promise((resolve, reject) => {
+async function getFlow() {
 
-    db.get(
-      `SELECT * FROM chatbot_flows LIMIT 1`,
-      [],
-      (err, row) => {
+  const { data, error } =
+    await supabase
+      .from('chatbot_flows')
+      .select('*')
+      .limit(1)
+      .single()
 
-        if (err) return reject(err)
+  if (error) {
+    console.error(error)
+    return null
+  }
 
-        resolve(row)
-      }
-    )
-  })
+  return data
 }
 
-function getRootNodes(flowId) {
-  return new Promise((resolve, reject) => {
+async function getRootNodes(flowId) {
 
-    db.all(
-      `
-      SELECT *
-      FROM chatbot_nodes
-      WHERE flow_id = ?
-      AND parent_id IS NULL
-      ORDER BY option_key
-      `,
-      [flowId],
-      (err, rows) => {
+  const { data, error } =
+    await supabase
+      .from('chatbot_nodes')
+      .select('*')
+      .eq('flow_id', flowId)
+      .is('parent_id', null)
+      .order('option_key')
 
-        if (err) return reject(err)
+  if (error) {
+    console.error(error)
+    return []
+  }
 
-        resolve(rows)
-      }
-    )
-  })
+  return data || []
 }
 
-function getChildren(parentId) {
-  return new Promise((resolve, reject) => {
+async function getChildren(parentId) {
 
-    db.all(
-      `
-      SELECT *
-      FROM chatbot_nodes
-      WHERE parent_id = ?
-      ORDER BY option_key
-      `,
-      [parentId],
-      (err, rows) => {
+  const { data, error } =
+    await supabase
+      .from('chatbot_nodes')
+      .select('*')
+      .eq('parent_id', parentId)
+      .order('option_key')
 
-        if (err) return reject(err)
+  if (error) {
+    console.error(error)
+    return []
+  }
 
-        resolve(rows)
-      }
-    )
-  })
+  return data || []
 }
 
-function getNodeByOption(flowId, parentId, option) {
+async function getNodeByOption(
+  flowId,
+  parentId,
+  option
+) {
 
-  return new Promise((resolve, reject) => {
+  let query =
+    supabase
+      .from('chatbot_nodes')
+      .select('*')
+      .eq('flow_id', flowId)
+      .eq('option_key', option)
 
-    let sql = `
-      SELECT *
-      FROM chatbot_nodes
-      WHERE flow_id = ?
-      AND option_key = ?
-    `
+  if (parentId === null) {
 
-    const params = [flowId, option]
+    query =
+      query.is('parent_id', null)
 
-    if (parentId === null) {
-      sql += ` AND parent_id IS NULL`
-    } else {
-      sql += ` AND parent_id = ?`
-      params.push(parentId)
-    }
+  } else {
 
-    db.get(sql, params, (err, row) => {
+    query =
+      query.eq('parent_id', parentId)
+  }
 
-      if (err) return reject(err)
+  const { data, error } =
+    await query.single()
 
-      resolve(row)
-    })
-  })
+  if (error) {
+    return null
+  }
+
+  return data
 }
 
 async function buildMenu(nodes) {
 
-  let text = 'Escolha uma opção:\n\n'
+  let text =
+    'Escolha uma opção:\n\n'
 
   for (const node of nodes) {
-    text += `${node.option_key} - ${node.title}\n`
+
+    text +=
+      `${node.option_key} - ${node.title}\n`
   }
 
   return text
 }
 
-async function startSession(phone, sock, jid) {
+async function startSession(
+  phone,
+  sock,
+  jid
+) {
 
   const flow = await getFlow()
 
   if (!flow) return
 
-  const roots = await getRootNodes(flow.id)
+  const roots =
+    await getRootNodes(flow.id)
 
   sessions.set(phone, {
     flowId: flow.id,
@@ -137,7 +144,8 @@ async function startSession(phone, sock, jid) {
     lastInteraction: Date.now()
   })
 
-  const menu = await buildMenu(roots)
+  const menu =
+    await buildMenu(roots)
 
   await sock.sendMessage(jid, {
     text:
@@ -147,19 +155,26 @@ ${menu}`
   })
 }
 
-async function processOption(phone, option, sock, jid) {
+async function processOption(
+  phone,
+  option,
+  sock,
+  jid
+) {
 
-  const session = sessions.get(phone)
+  const session =
+    sessions.get(phone)
 
   if (!session) {
     return
   }
 
-  const node = await getNodeByOption(
-    session.flowId,
-    session.currentNodeId,
-    option
-  )
+  const node =
+    await getNodeByOption(
+      session.flowId,
+      session.currentNodeId,
+      option
+    )
 
   if (!node) {
 
@@ -170,25 +185,33 @@ async function processOption(phone, option, sock, jid) {
     return
   }
 
-  session.lastInteraction = Date.now()
+  session.lastInteraction =
+    Date.now()
 
-  const children = await getChildren(node.id)
+  const children =
+    await getChildren(node.id)
 
   if (children.length === 0) {
 
     await sock.sendMessage(jid, {
-      text: node.message || 'Sem conteúdo.'
+      text:
+        node.message ||
+        'Sem conteúdo.'
     })
 
     return
   }
 
-  session.currentNodeId = node.id
+  session.currentNodeId =
+    node.id
 
-  let text = `${node.message || ''}\n\n`
+  let text =
+    `${node.message || ''}\n\n`
 
   for (const child of children) {
-    text += `${child.option_key} - ${child.title}\n`
+
+    text +=
+      `${child.option_key} - ${child.title}\n`
   }
 
   await sock.sendMessage(jid, {
@@ -196,18 +219,29 @@ async function processOption(phone, option, sock, jid) {
   })
 }
 
-async function handleIncomingMessage(phone, text, sock, jid) {
+async function handleIncomingMessage(
+  phone,
+  text,
+  sock,
+  jid
+) {
 
-  const normalized = normalize(text)
+  const normalized =
+    normalize(text)
 
   if (isTrigger(normalized)) {
 
-    await startSession(phone, sock, jid)
+    await startSession(
+      phone,
+      sock,
+      jid
+    )
 
     return
   }
 
-  const session = sessions.get(phone)
+  const session =
+    sessions.get(phone)
 
   if (!session) {
     return
@@ -225,18 +259,26 @@ async function checkTimeouts(sock) {
 
   const now = Date.now()
 
-  for (const [phone, session] of sessions.entries()) {
+  for (
+    const [phone, session]
+    of sessions.entries()
+  ) {
 
     const diffMinutes =
-      (now - session.lastInteraction) / 1000 / 60
+      (now - session.lastInteraction)
+      / 1000 / 60
 
     if (diffMinutes >= 5) {
 
       const jid =
         '55' +
-        phone.replace(/\D/g, '')
+        phone
+          .replace(/\D/g, '')
           .replace(/^55/, '')
-          .replace(/^(\d{2})(\d{8})$/, '$19$2')
+          .replace(
+            /^(\d{2})(\d{8})$/,
+            '$19$2'
+          )
         +
         '@s.whatsapp.net'
 
